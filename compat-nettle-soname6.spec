@@ -6,14 +6,13 @@
 #
 Name     : compat-nettle-soname6
 Version  : 3.4.1
-Release  : 40
+Release  : 41
 URL      : https://mirrors.kernel.org/gnu/nettle/nettle-3.4.1.tar.gz
 Source0  : https://mirrors.kernel.org/gnu/nettle/nettle-3.4.1.tar.gz
 Source99 : https://mirrors.kernel.org/gnu/nettle/nettle-3.4.1.tar.gz.sig
 Summary  : Nettle low-level cryptographic library (symmetric algorithms)
 Group    : Development/Tools
 License  : GPL-2.0 GPL-3.0 LGPL-3.0
-Requires: compat-nettle-soname6-bin = %{version}-%{release}
 Requires: compat-nettle-soname6-lib = %{version}-%{release}
 Requires: compat-nettle-soname6-license = %{version}-%{release}
 Requires: p11-kit
@@ -55,20 +54,10 @@ documentation, etc. Examples are the Nettle module for the Pike
 language, and LSH, which both use an object-oriented abstraction on top
 of the library.
 
-%package bin
-Summary: bin components for the compat-nettle-soname6 package.
-Group: Binaries
-Requires: compat-nettle-soname6-license = %{version}-%{release}
-
-%description bin
-bin components for the compat-nettle-soname6 package.
-
-
 %package dev
 Summary: dev components for the compat-nettle-soname6 package.
 Group: Development
 Requires: compat-nettle-soname6-lib = %{version}-%{release}
-Requires: compat-nettle-soname6-bin = %{version}-%{release}
 Provides: compat-nettle-soname6-devel = %{version}-%{release}
 Requires: compat-nettle-soname6 = %{version}-%{release}
 Requires: compat-nettle-soname6 = %{version}-%{release}
@@ -81,7 +70,6 @@ dev components for the compat-nettle-soname6 package.
 Summary: dev32 components for the compat-nettle-soname6 package.
 Group: Default
 Requires: compat-nettle-soname6-lib32 = %{version}-%{release}
-Requires: compat-nettle-soname6-bin = %{version}-%{release}
 Requires: compat-nettle-soname6-dev = %{version}-%{release}
 
 %description dev32
@@ -133,7 +121,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1562053329
+export SOURCE_DATE_EPOCH=1562053551
 export GCC_IGNORE_WERROR=1
 export CFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
 export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
@@ -160,7 +148,7 @@ make -C testsuite check
 make -C ../build32/testsuite check
 
 %install
-export SOURCE_DATE_EPOCH=1562053329
+export SOURCE_DATE_EPOCH=1562053551
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/compat-nettle-soname6
 cp COPYING.LESSERv3 %{buildroot}/usr/share/package-licenses/compat-nettle-soname6/COPYING.LESSERv3
@@ -176,17 +164,12 @@ popd
 fi
 popd
 %make_install
+## install_append content
+rm -f %{buildroot}/usr/bin/*
+## install_append end
 
 %files
 %defattr(-,root,root,-)
-
-%files bin
-%defattr(-,root,root,-)
-%exclude /usr/bin/nettle-hash
-%exclude /usr/bin/nettle-lfib-stream
-%exclude /usr/bin/nettle-pbkdf2
-%exclude /usr/bin/pkcs1-conv
-%exclude /usr/bin/sexp-conv
 
 %files dev
 %defattr(-,root,root,-)
