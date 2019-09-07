@@ -6,10 +6,10 @@
 #
 Name     : compat-nettle-soname6
 Version  : 3.4.1
-Release  : 41
+Release  : 42
 URL      : https://mirrors.kernel.org/gnu/nettle/nettle-3.4.1.tar.gz
 Source0  : https://mirrors.kernel.org/gnu/nettle/nettle-3.4.1.tar.gz
-Source99 : https://mirrors.kernel.org/gnu/nettle/nettle-3.4.1.tar.gz.sig
+Source1 : https://mirrors.kernel.org/gnu/nettle/nettle-3.4.1.tar.gz.sig
 Summary  : Nettle low-level cryptographic library (symmetric algorithms)
 Group    : Development/Tools
 License  : GPL-2.0 GPL-3.0 LGPL-3.0
@@ -27,6 +27,8 @@ BuildRequires : gmp-lib32
 BuildRequires : openssl-dev
 BuildRequires : p11-kit
 BuildRequires : texinfo
+# Suppress generation of debuginfo
+%global debug_package %{nil}
 
 %description
 What is GNU Nettle? A quote from the introduction in the Nettle Manual:
@@ -53,36 +55,6 @@ interfaces on top of Nettle, and share the code, test cases, benchmarks,
 documentation, etc. Examples are the Nettle module for the Pike
 language, and LSH, which both use an object-oriented abstraction on top
 of the library.
-
-%package dev
-Summary: dev components for the compat-nettle-soname6 package.
-Group: Development
-Requires: compat-nettle-soname6-lib = %{version}-%{release}
-Provides: compat-nettle-soname6-devel = %{version}-%{release}
-Requires: compat-nettle-soname6 = %{version}-%{release}
-Requires: compat-nettle-soname6 = %{version}-%{release}
-
-%description dev
-dev components for the compat-nettle-soname6 package.
-
-
-%package dev32
-Summary: dev32 components for the compat-nettle-soname6 package.
-Group: Default
-Requires: compat-nettle-soname6-lib32 = %{version}-%{release}
-Requires: compat-nettle-soname6-dev = %{version}-%{release}
-
-%description dev32
-dev32 components for the compat-nettle-soname6 package.
-
-
-%package doc
-Summary: doc components for the compat-nettle-soname6 package.
-Group: Documentation
-
-%description doc
-doc components for the compat-nettle-soname6 package.
-
 
 %package lib
 Summary: lib components for the compat-nettle-soname6 package.
@@ -121,7 +93,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1562053551
+export SOURCE_DATE_EPOCH=1567827795
 export GCC_IGNORE_WERROR=1
 export CFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
 export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
@@ -133,9 +105,9 @@ make  %{?_smp_mflags}
 pushd ../build32/
 export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
 export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
-export CFLAGS="${CFLAGS}${CFLAGS:+ }-m32"
-export CXXFLAGS="${CXXFLAGS}${CXXFLAGS:+ }-m32"
-export LDFLAGS="${LDFLAGS}${LDFLAGS:+ }-m32"
+export CFLAGS="${CFLAGS}${CFLAGS:+ }-m32 -mstackrealign"
+export CXXFLAGS="${CXXFLAGS}${CXXFLAGS:+ }-m32 -mstackrealign"
+export LDFLAGS="${LDFLAGS}${LDFLAGS:+ }-m32 -mstackrealign"
 %configure --disable-static --disable-openssl --enable-shared --enable-static  --enable-x86-aesni   --libdir=/usr/lib32 --build=i686-generic-linux-gnu --host=i686-generic-linux-gnu --target=i686-clr-linux-gnu
 make  %{?_smp_mflags}
 popd
@@ -148,7 +120,7 @@ make -C testsuite check
 make -C ../build32/testsuite check
 
 %install
-export SOURCE_DATE_EPOCH=1562053551
+export SOURCE_DATE_EPOCH=1567827795
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/compat-nettle-soname6
 cp COPYING.LESSERv3 %{buildroot}/usr/share/package-licenses/compat-nettle-soname6/COPYING.LESSERv3
@@ -164,94 +136,90 @@ popd
 fi
 popd
 %make_install
+## Remove excluded files
+rm -f %{buildroot}/usr/bin/nettle-hash
+rm -f %{buildroot}/usr/bin/nettle-lfib-stream
+rm -f %{buildroot}/usr/bin/pkcs1-conv
+rm -f %{buildroot}/usr/bin/sexp-conv
+rm -f %{buildroot}/usr/include/nettle/aes.h
+rm -f %{buildroot}/usr/include/nettle/arcfour.h
+rm -f %{buildroot}/usr/include/nettle/arctwo.h
+rm -f %{buildroot}/usr/include/nettle/asn1.h
+rm -f %{buildroot}/usr/include/nettle/base16.h
+rm -f %{buildroot}/usr/include/nettle/base64.h
+rm -f %{buildroot}/usr/include/nettle/bignum.h
+rm -f %{buildroot}/usr/include/nettle/blowfish.h
+rm -f %{buildroot}/usr/include/nettle/buffer.h
+rm -f %{buildroot}/usr/include/nettle/camellia.h
+rm -f %{buildroot}/usr/include/nettle/cast128.h
+rm -f %{buildroot}/usr/include/nettle/cbc.h
+rm -f %{buildroot}/usr/include/nettle/ccm.h
+rm -f %{buildroot}/usr/include/nettle/cfb.h
+rm -f %{buildroot}/usr/include/nettle/chacha-poly1305.h
+rm -f %{buildroot}/usr/include/nettle/chacha.h
+rm -f %{buildroot}/usr/include/nettle/ctr.h
+rm -f %{buildroot}/usr/include/nettle/curve25519.h
+rm -f %{buildroot}/usr/include/nettle/des-compat.h
+rm -f %{buildroot}/usr/include/nettle/des.h
+rm -f %{buildroot}/usr/include/nettle/dsa-compat.h
+rm -f %{buildroot}/usr/include/nettle/dsa.h
+rm -f %{buildroot}/usr/include/nettle/eax.h
+rm -f %{buildroot}/usr/include/nettle/ecc-curve.h
+rm -f %{buildroot}/usr/include/nettle/ecc.h
+rm -f %{buildroot}/usr/include/nettle/ecdsa.h
+rm -f %{buildroot}/usr/include/nettle/eddsa.h
+rm -f %{buildroot}/usr/include/nettle/gcm.h
+rm -f %{buildroot}/usr/include/nettle/gosthash94.h
+rm -f %{buildroot}/usr/include/nettle/hkdf.h
+rm -f %{buildroot}/usr/include/nettle/hmac.h
+rm -f %{buildroot}/usr/include/nettle/knuth-lfib.h
+rm -f %{buildroot}/usr/include/nettle/macros.h
+rm -f %{buildroot}/usr/include/nettle/md2.h
+rm -f %{buildroot}/usr/include/nettle/md4.h
+rm -f %{buildroot}/usr/include/nettle/md5-compat.h
+rm -f %{buildroot}/usr/include/nettle/md5.h
+rm -f %{buildroot}/usr/include/nettle/memops.h
+rm -f %{buildroot}/usr/include/nettle/memxor.h
+rm -f %{buildroot}/usr/include/nettle/nettle-meta.h
+rm -f %{buildroot}/usr/include/nettle/nettle-stdint.h
+rm -f %{buildroot}/usr/include/nettle/nettle-types.h
+rm -f %{buildroot}/usr/include/nettle/pbkdf2.h
+rm -f %{buildroot}/usr/include/nettle/pgp.h
+rm -f %{buildroot}/usr/include/nettle/pkcs1.h
+rm -f %{buildroot}/usr/include/nettle/poly1305.h
+rm -f %{buildroot}/usr/include/nettle/pss-mgf1.h
+rm -f %{buildroot}/usr/include/nettle/pss.h
+rm -f %{buildroot}/usr/include/nettle/realloc.h
+rm -f %{buildroot}/usr/include/nettle/ripemd160.h
+rm -f %{buildroot}/usr/include/nettle/rsa.h
+rm -f %{buildroot}/usr/include/nettle/salsa20.h
+rm -f %{buildroot}/usr/include/nettle/serpent.h
+rm -f %{buildroot}/usr/include/nettle/sexp.h
+rm -f %{buildroot}/usr/include/nettle/sha.h
+rm -f %{buildroot}/usr/include/nettle/sha1.h
+rm -f %{buildroot}/usr/include/nettle/sha2.h
+rm -f %{buildroot}/usr/include/nettle/sha3.h
+rm -f %{buildroot}/usr/include/nettle/twofish.h
+rm -f %{buildroot}/usr/include/nettle/umac.h
+rm -f %{buildroot}/usr/include/nettle/version.h
+rm -f %{buildroot}/usr/include/nettle/yarrow.h
+rm -f %{buildroot}/usr/lib32/libhogweed.so
+rm -f %{buildroot}/usr/lib32/libnettle.so
+rm -f %{buildroot}/usr/lib32/pkgconfig/32hogweed.pc
+rm -f %{buildroot}/usr/lib32/pkgconfig/32nettle.pc
+rm -f %{buildroot}/usr/lib32/pkgconfig/hogweed.pc
+rm -f %{buildroot}/usr/lib32/pkgconfig/nettle.pc
+rm -f %{buildroot}/usr/lib64/libhogweed.so
+rm -f %{buildroot}/usr/lib64/libnettle.so
+rm -f %{buildroot}/usr/lib64/pkgconfig/hogweed.pc
+rm -f %{buildroot}/usr/lib64/pkgconfig/nettle.pc
+rm -f %{buildroot}/usr/share/info/nettle.info
 ## install_append content
 rm -f %{buildroot}/usr/bin/*
 ## install_append end
 
 %files
 %defattr(-,root,root,-)
-
-%files dev
-%defattr(-,root,root,-)
-%exclude /usr/include/nettle/aes.h
-%exclude /usr/include/nettle/arcfour.h
-%exclude /usr/include/nettle/arctwo.h
-%exclude /usr/include/nettle/asn1.h
-%exclude /usr/include/nettle/base16.h
-%exclude /usr/include/nettle/base64.h
-%exclude /usr/include/nettle/bignum.h
-%exclude /usr/include/nettle/blowfish.h
-%exclude /usr/include/nettle/buffer.h
-%exclude /usr/include/nettle/camellia.h
-%exclude /usr/include/nettle/cast128.h
-%exclude /usr/include/nettle/cbc.h
-%exclude /usr/include/nettle/ccm.h
-%exclude /usr/include/nettle/cfb.h
-%exclude /usr/include/nettle/chacha-poly1305.h
-%exclude /usr/include/nettle/chacha.h
-%exclude /usr/include/nettle/ctr.h
-%exclude /usr/include/nettle/curve25519.h
-%exclude /usr/include/nettle/des-compat.h
-%exclude /usr/include/nettle/des.h
-%exclude /usr/include/nettle/dsa-compat.h
-%exclude /usr/include/nettle/dsa.h
-%exclude /usr/include/nettle/eax.h
-%exclude /usr/include/nettle/ecc-curve.h
-%exclude /usr/include/nettle/ecc.h
-%exclude /usr/include/nettle/ecdsa.h
-%exclude /usr/include/nettle/eddsa.h
-%exclude /usr/include/nettle/gcm.h
-%exclude /usr/include/nettle/gosthash94.h
-%exclude /usr/include/nettle/hkdf.h
-%exclude /usr/include/nettle/hmac.h
-%exclude /usr/include/nettle/knuth-lfib.h
-%exclude /usr/include/nettle/macros.h
-%exclude /usr/include/nettle/md2.h
-%exclude /usr/include/nettle/md4.h
-%exclude /usr/include/nettle/md5-compat.h
-%exclude /usr/include/nettle/md5.h
-%exclude /usr/include/nettle/memops.h
-%exclude /usr/include/nettle/memxor.h
-%exclude /usr/include/nettle/nettle-meta.h
-%exclude /usr/include/nettle/nettle-stdint.h
-%exclude /usr/include/nettle/nettle-types.h
-%exclude /usr/include/nettle/pbkdf2.h
-%exclude /usr/include/nettle/pgp.h
-%exclude /usr/include/nettle/pkcs1.h
-%exclude /usr/include/nettle/poly1305.h
-%exclude /usr/include/nettle/pss-mgf1.h
-%exclude /usr/include/nettle/pss.h
-%exclude /usr/include/nettle/realloc.h
-%exclude /usr/include/nettle/ripemd160.h
-%exclude /usr/include/nettle/rsa.h
-%exclude /usr/include/nettle/salsa20.h
-%exclude /usr/include/nettle/serpent.h
-%exclude /usr/include/nettle/sexp.h
-%exclude /usr/include/nettle/sha.h
-%exclude /usr/include/nettle/sha1.h
-%exclude /usr/include/nettle/sha2.h
-%exclude /usr/include/nettle/sha3.h
-%exclude /usr/include/nettle/twofish.h
-%exclude /usr/include/nettle/umac.h
-%exclude /usr/include/nettle/version.h
-%exclude /usr/include/nettle/yarrow.h
-%exclude /usr/lib64/libhogweed.so
-%exclude /usr/lib64/libnettle.so
-%exclude /usr/lib64/pkgconfig/hogweed.pc
-%exclude /usr/lib64/pkgconfig/nettle.pc
-
-%files dev32
-%defattr(-,root,root,-)
-%exclude /usr/lib32/libhogweed.so
-%exclude /usr/lib32/libnettle.so
-%exclude /usr/lib32/pkgconfig/32hogweed.pc
-%exclude /usr/lib32/pkgconfig/32nettle.pc
-%exclude /usr/lib32/pkgconfig/hogweed.pc
-%exclude /usr/lib32/pkgconfig/nettle.pc
-
-%files doc
-%defattr(0644,root,root,0755)
-%exclude /usr/share/info/nettle.info
 
 %files lib
 %defattr(-,root,root,-)
@@ -269,6 +237,6 @@ rm -f %{buildroot}/usr/bin/*
 
 %files license
 %defattr(0644,root,root,0755)
-%exclude /usr/share/package-licenses/compat-nettle-soname6/COPYING.LESSERv3
-%exclude /usr/share/package-licenses/compat-nettle-soname6/COPYINGv2
-%exclude /usr/share/package-licenses/compat-nettle-soname6/COPYINGv3
+/usr/share/package-licenses/compat-nettle-soname6/COPYING.LESSERv3
+/usr/share/package-licenses/compat-nettle-soname6/COPYINGv2
+/usr/share/package-licenses/compat-nettle-soname6/COPYINGv3
