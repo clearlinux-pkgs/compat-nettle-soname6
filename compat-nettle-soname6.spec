@@ -6,10 +6,10 @@
 #
 Name     : compat-nettle-soname6
 Version  : 3.4.1
-Release  : 44
+Release  : 45
 URL      : https://mirrors.kernel.org/gnu/nettle/nettle-3.4.1.tar.gz
 Source0  : https://mirrors.kernel.org/gnu/nettle/nettle-3.4.1.tar.gz
-Source1 : https://mirrors.kernel.org/gnu/nettle/nettle-3.4.1.tar.gz.sig
+Source1  : https://mirrors.kernel.org/gnu/nettle/nettle-3.4.1.tar.gz.sig
 Summary  : Nettle low-level cryptographic library (symmetric algorithms)
 Group    : Development/Tools
 License  : GPL-2.0 GPL-3.0 LGPL-3.0
@@ -27,6 +27,7 @@ BuildRequires : gmp-lib32
 BuildRequires : openssl-dev
 BuildRequires : p11-kit
 BuildRequires : texinfo
+BuildRequires : valgrind-dev
 # Suppress generation of debuginfo
 %global debug_package %{nil}
 
@@ -84,6 +85,7 @@ license components for the compat-nettle-soname6 package.
 
 %prep
 %setup -q -n nettle-3.4.1
+cd %{_builddir}/nettle-3.4.1
 pushd ..
 cp -a nettle-3.4.1 build32
 popd
@@ -93,11 +95,11 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1567827795
+export SOURCE_DATE_EPOCH=1604887088
 export GCC_IGNORE_WERROR=1
 export CFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export FCFLAGS="$FFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export FFLAGS="$FFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
 export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
 %configure --disable-static --disable-openssl --enable-shared --enable-static  --enable-x86-aesni
 make  %{?_smp_mflags}
@@ -117,15 +119,16 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 make -C testsuite check
+#make -C ../buildavx2/testsuite check
 make -C ../build32/testsuite check
 
 %install
-export SOURCE_DATE_EPOCH=1567827795
+export SOURCE_DATE_EPOCH=1604887088
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/compat-nettle-soname6
-cp COPYING.LESSERv3 %{buildroot}/usr/share/package-licenses/compat-nettle-soname6/COPYING.LESSERv3
-cp COPYINGv2 %{buildroot}/usr/share/package-licenses/compat-nettle-soname6/COPYINGv2
-cp COPYINGv3 %{buildroot}/usr/share/package-licenses/compat-nettle-soname6/COPYINGv3
+cp %{_builddir}/nettle-3.4.1/COPYING.LESSERv3 %{buildroot}/usr/share/package-licenses/compat-nettle-soname6/e7d563f52bf5295e6dba1d67ac23e9f6a160fab9
+cp %{_builddir}/nettle-3.4.1/COPYINGv2 %{buildroot}/usr/share/package-licenses/compat-nettle-soname6/4cc77b90af91e615a64ae04893fdffa7939db84c
+cp %{_builddir}/nettle-3.4.1/COPYINGv3 %{buildroot}/usr/share/package-licenses/compat-nettle-soname6/e88f6aea9379eb98a7bbea965fc7127a64b41ad9
 pushd ../build32/
 %make_install32
 if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
@@ -237,6 +240,6 @@ rm -f %{buildroot}/usr/bin/*
 
 %files license
 %defattr(0644,root,root,0755)
-/usr/share/package-licenses/compat-nettle-soname6/COPYING.LESSERv3
-/usr/share/package-licenses/compat-nettle-soname6/COPYINGv2
-/usr/share/package-licenses/compat-nettle-soname6/COPYINGv3
+/usr/share/package-licenses/compat-nettle-soname6/4cc77b90af91e615a64ae04893fdffa7939db84c
+/usr/share/package-licenses/compat-nettle-soname6/e7d563f52bf5295e6dba1d67ac23e9f6a160fab9
+/usr/share/package-licenses/compat-nettle-soname6/e88f6aea9379eb98a7bbea965fc7127a64b41ad9
